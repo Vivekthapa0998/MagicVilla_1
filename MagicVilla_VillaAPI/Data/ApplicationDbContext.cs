@@ -9,6 +9,7 @@ namespace MagicVilla_VillaAPI.Data
         {
 
         }
+        public DbSet<LocalUser> LocalUsers { get; set; }
         public DbSet<Villa> Villas { get; set; }   
         public DbSet<VillaNumber> VillaNumbers { get; set;}
 
@@ -20,7 +21,7 @@ namespace MagicVilla_VillaAPI.Data
                     Id = 1,
                     Name= "Royal villa",
                     Details="this villa is very beautiful villa with beautiful surrounding and sunrise view",
-                    ImageUrl= "https://stock.adobe.com/in/images/tropical-villa-at-night/309464116",
+                    ImageUrl= "https://dotnetmastery.com/bluevillaimages/villa3.jpg",
                     Occupancy=4,
                     Rate=20000,
                     Sqft=2100,
@@ -32,7 +33,7 @@ namespace MagicVilla_VillaAPI.Data
                     Id = 2,
                     Name = "vivek villa",
                     Details = "this villa is very beautiful villa with beautiful surrounding and sunrise view",
-                    ImageUrl = "https://stock.adobe.com/in/images/tropical-villa-at-night/309464116",
+                    ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa1.jpg",
                     Occupancy = 4,
                     Rate = 20000,
                     Sqft = 2100,
@@ -44,7 +45,7 @@ namespace MagicVilla_VillaAPI.Data
                     Id = 3,
                     Name = "Royal hill villa",
                     Details = "this villa is very beautiful villa with beautiful surrounding and sunrise view",
-                    ImageUrl = "https://stock.adobe.com/in/images/tropical-villa-at-night/309464116",
+                    ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa4.jpg",
                     Occupancy = 4,
                     Rate = 20000,
                     Sqft = 2100,
@@ -56,7 +57,7 @@ namespace MagicVilla_VillaAPI.Data
                     Id = 4,
                     Name = "villa in hills",
                     Details = "this villa is very beautiful villa with beautiful surrounding and sunrise view",
-                    ImageUrl = "https://stock.adobe.com/in/images/tropical-villa-at-night/309464116",
+                    ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa5.jpg",
                     Occupancy = 4,
                     Rate = 20000,
                     Sqft = 2100,
@@ -68,7 +69,7 @@ namespace MagicVilla_VillaAPI.Data
                     Id = 5,
                     Name = "villa rosemary",
                     Details = "this villa is very beautiful villa with beautiful surrounding and sunrise view",
-                    ImageUrl = "https://stock.adobe.com/in/images/tropical-villa-at-night/309464116",
+                    ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa2.jpg",
                     Occupancy = 4,
                     Rate = 20000,
                     Sqft = 2100,

@@ -4,6 +4,7 @@ using MagicVilla_VillaAPI.Logging;
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.Dto;
 using MagicVilla_VillaAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
@@ -36,12 +37,13 @@ namespace MagicVilla_VillaAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        
         public async Task <ActionResult<APIResponse>> GetVillaNumbers()
         {
             
             try
             {
-                IEnumerable<VillaNumber> villaNumberList = await _dbVillaNumber.GetAllAsync();
+                IEnumerable<VillaNumber> villaNumberList = await _dbVillaNumber.GetAllAsync(includeProperties:"Villa");
                 _response.Result = _mapper.Map<List<VillaNumberDto>>(villaNumberList);
                 _response.IsSuccess = true;
                 _response.StatusCode = HttpStatusCode.OK;
@@ -59,7 +61,7 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-       
+        
         public async Task <ActionResult<APIResponse>> GetVillaNumber(int id)
         {
             try
@@ -71,7 +73,7 @@ namespace MagicVilla_VillaAPI.Controllers
                     _response.StatusCode= HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var villaNumber = await _dbVillaNumber.GetAsync(u => u.VillaNo == id);
+                var villaNumber = await _dbVillaNumber.GetAsync(u => u.VillaNo == id, includeProperties:"Villa");
                 if (villaNumber == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
@@ -94,18 +96,19 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
         public async Task <ActionResult<APIResponse>> CreateVillaNumber([FromBody] VillaNumberCreateDto createDto)
         {
             try
             {
                 if (await _dbVillaNumber.GetAsync(u => u.VillaNo == createDto.VillaNo) != null)
                 {
-                    ModelState.AddModelError("customError", "Villa number already exist");
+                    ModelState.AddModelError("ErrorMessages", "Villa number already exist");
                     return BadRequest(ModelState);
                 }
                 if(await _dbVilla.GetAsync(u=> u.Id== createDto.VillaId) == null)
                 {
-                    ModelState.AddModelError("custom error1", "invalid villa id provided");
+                    ModelState.AddModelError("ErrorMessages", "invalid villa id provided");
                     return BadRequest(ModelState);
                    
                 }
@@ -137,6 +140,7 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [Authorize]
         public async Task <ActionResult<APIResponse>> DeleteVillaNumber(int id) 
         {
             try
@@ -166,6 +170,7 @@ namespace MagicVilla_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public async Task <ActionResult<APIResponse>> UpdateVillaNumber(int id,[FromBody] VillaNumberUpdateDto updateDto)
         {
             try
@@ -176,7 +181,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 }
                 if (await _dbVilla.GetAsync(u => u.Id == updateDto.VillaId) == null)
                 {
-                    ModelState.AddModelError("custom error1", "invalid villa id provided");
+                    ModelState.AddModelError("ErrorMessages", "invalid villa id provided");
                     return BadRequest(ModelState);
 
                 }
