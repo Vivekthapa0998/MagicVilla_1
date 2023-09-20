@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Runtime.Serialization.Json;
 
 namespace MagicVilla_VillaAPI.Controllers
 {
@@ -77,17 +80,34 @@ namespace MagicVilla_VillaAPI.Controllers
         }
 
         [HttpGet]
-        
+        [ResponseCache(CacheProfileName ="Default30")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task <ActionResult<APIResponse>> GetVillas()
+        public async Task <ActionResult<APIResponse>> GetVillas([FromQuery(Name ="FilterOccupancy")] int? occupancy ,
+            [FromQuery] string? search, int pageSize=0,int pageNumber=1)
         {
             //_logger.LogInformation("Getting all villas");
             //_logger.Log("Getting all villas","");
             try
             {
-                IEnumerable<Villa> villaList = await _dbVilla.GetAllAsync();
+                IEnumerable<Villa> villaList;
+                if(occupancy>0)
+                {
+                    villaList= await _dbVilla.GetAllAsync(u=> u.Occupancy == occupancy,pageSize:pageSize,pageNumber:pageNumber);
+                }
+                else
+                {
+                    villaList = await _dbVilla.GetAllAsync( pageSize: pageSize, pageNumber: pageNumber);
+                }
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    villaList= villaList.Where(u=> u.Name.ToLower().Contains(search));
+                }
+
+                Pagination pagination = new() { PageNumber = pageNumber, PageSize = pageSize };
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagination));
                 _response.Result = _mapper.Map<List<VillaDto>>(villaList);
                 _response.IsSuccess = true;
                 _response.StatusCode = HttpStatusCode.OK;
@@ -124,6 +144,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 var villa = await _dbVilla.GetAsync(u => u.Id == id);
                 if (villa == null)
                 {
+                    _response.IsSuccess = false;
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }

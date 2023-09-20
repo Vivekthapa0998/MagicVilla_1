@@ -38,13 +38,13 @@ namespace MagicVilla_Web.Controllers
         {
             VillaNumberCreateVM villaNumberVM = new();
             var response = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-            if(response!= null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
-                villaNumberVM.VillaList=JsonConvert.DeserializeObject<List<VillaDto>>
-                    (Convert.ToString(response.Result)).Select(i=> new SelectListItem
+                villaNumberVM.VillaList = JsonConvert.DeserializeObject<List<VillaDto>>
+                    (Convert.ToString(response.Result)).Select(i => new SelectListItem
                     {
-                        Text=i.Name,
-                        Value=i.Id.ToString()
+                        Text = i.Name,
+                        Value = i.Id.ToString()
                     });
             }
             return View(villaNumberVM);
@@ -80,7 +80,7 @@ namespace MagicVilla_Web.Controllers
                         Value = i.Id.ToString()
                     });
             }
-           
+
             return View(model);
         }
 
@@ -91,9 +91,9 @@ namespace MagicVilla_Web.Controllers
             if (response != null && response.IsSuccess)
             {
                 VillaNumberDto model = JsonConvert.DeserializeObject<VillaNumberDto>(Convert.ToString(response.Result));
-                villaNumberVM.VillaNumber=_mapper.Map<VillaNumberUpdateDto>(model);
+                villaNumberVM.VillaNumber = _mapper.Map<VillaNumberUpdateDto>(model);
             }
-             response = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            response = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 villaNumberVM.VillaList = JsonConvert.DeserializeObject<List<VillaDto>>
@@ -120,13 +120,22 @@ namespace MagicVilla_Web.Controllers
                 }
                 else
                 {
-                    if(response== null)
+                    if (response == null)
                     {
-                        TempData["error"] = "Invalid user";
-                        return View();
+                        var resp1 = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+                        if (resp1 != null && resp1.IsSuccess)
+                        {
+                            model.VillaList = JsonConvert.DeserializeObject<List<VillaDto>>
+                                (Convert.ToString(resp1.Result)).Select(i => new SelectListItem
+                                {
+                                    Text = i.Name,
+                                    Value = i.Id.ToString()
+                                });
+                        }
+                        return View(model);
                     }
 
-                     else if (response.ErrorMessages.Count > 0)
+                    else if (response.ErrorMessages.Count > 0)
                     {
                         ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
                     }
@@ -181,9 +190,11 @@ namespace MagicVilla_Web.Controllers
             {
                 return RedirectToAction(nameof(IndexVillaNumber));
             }
+            
 
-            return View(model);
+             return View(model);
+            
+
         }
-
     }
 }
